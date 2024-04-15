@@ -1,3 +1,11 @@
+main {
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: max-content; */
+}
+
 #app {
   display: flex;
   flex-direction: row;
@@ -8,4 +16,28 @@
 
 #app figure:first-of-type {
   display: none;
+}
+
+#app figure figcaption span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#app figure figcaption span p:last-of-type {
+  background: lightblue;
+}
+
+#navigation div figure {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.5rem;
+  background: #4ba598;
+}
+
+#navigation div figure img {
+  width: 10vw;
+  filter: invert(100%);
 }

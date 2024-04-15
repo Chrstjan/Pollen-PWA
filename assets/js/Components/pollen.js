@@ -1,5 +1,9 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 
+const pollenContainer = document.getElementById("app");
+
+let pollenDataArray = [];
+
 export const getPollenData = async (lat, long) => {
   console.log("Pollen!!");
   const endpoint = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${long}&current=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&timezone=Europe%2FBerlin&forecast_days=1`;
@@ -8,14 +12,15 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
-const recivedPollenData = (pollenData) => {
+const recivedPollenData = async (pollenData) => {
+  pollenDataArray = pollenData;
   let viewData = [];
-  pollenData.current.img = "";
-  viewData.push(pollenData.current);
+  // pollenData.current.img = "";
+  viewData.push(pollenDataArray.current);
 
   //   console.log(viewData);
 
-  let timeStamps = pollenData.hourly.time;
+  let timeStamps = pollenDataArray.hourly.time;
 
   let hourData = [];
 
@@ -31,12 +36,14 @@ const recivedPollenData = (pollenData) => {
     hourDataObjects.time = timestamp;
     //Time format for view code
     hourDataObjects.formattedTime = formattedTime;
-    hourDataObjects.alder_pollen = pollenData.hourly.alder_pollen[index];
-    hourDataObjects.birch_pollen = pollenData.hourly.birch_pollen[index];
-    hourDataObjects.grass_pollen = pollenData.hourly.grass_pollen[index];
-    hourDataObjects.mugwort_pollen = pollenData.hourly.mugwort_pollen[index];
-    hourDataObjects.olive_pollen = pollenData.hourly.olive_pollen[index];
-    hourDataObjects.ragweed_pollen = pollenData.hourly.ragweed_pollen[index];
+    hourDataObjects.alder_pollen = pollenDataArray.hourly.alder_pollen[index];
+    hourDataObjects.birch_pollen = pollenDataArray.hourly.birch_pollen[index];
+    hourDataObjects.grass_pollen = pollenDataArray.hourly.grass_pollen[index];
+    hourDataObjects.mugwort_pollen =
+      pollenDataArray.hourly.mugwort_pollen[index];
+    hourDataObjects.olive_pollen = pollenDataArray.hourly.olive_pollen[index];
+    hourDataObjects.ragweed_pollen =
+      pollenDataArray.hourly.ragweed_pollen[index];
 
     hourData.push(hourDataObjects);
   });
@@ -53,17 +60,14 @@ const recivedPollenData = (pollenData) => {
     return dataHour >= curHour && dataHour <= curHour + 4;
   });
 
-  //Build current pollen
-  //   buildCurrentPollen(viewData);
-  //Build hourly pollen
-  //   buildHourlyPollen(hourData);
-  buildHourlyPollen(filteredHourlyData);
+  //Build pollen view
+  buildPollen(filteredHourlyData);
 };
 
-const buildHourlyPollen = (pollen) => {
+const buildPollen = (pollen) => {
   console.log(pollen);
-  const pollenContainer = document.getElementById("app");
 
+  pollenContainer.innerHTML = "";
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time'
@@ -94,3 +98,52 @@ const buildHourlyPollen = (pollen) => {
     pollenContainer.innerHTML += pollenFigure;
   });
 };
+
+const pollenSettings = () => {
+  console.log("hello");
+
+  pollenContainer.innerHTML = "";
+
+  let settingElm = `
+    <div>
+      <header>
+        <h2>Mine Allergier</h2>
+      </header>
+      <span>
+        <p>alder pollen</p>
+        <input type="checkbox" id="alderCheckbox" checked>
+      </span>
+      <span>
+        <p>birch pollen</p>
+        <input type="checkbox" id="birchCheckbox" checked>
+      </span>
+      <span>
+        <p>grass pollen</p>
+        <input type="checkbox" id="grassCheckbox" checked>
+      </span>
+      <span>
+        <p>mugwort pollen</p>
+        <input type="checkbox" id="mugwortCheckbox" checked>
+      </span>
+      <span>
+        <p>olive pollen</p>
+        <input type="checkbox" id="oliveCheckbox" checked>
+      </span>
+      <span>
+        <p>ragweed pollen</p>
+        <input type="checkbox" id="ragweedCheckbox" checked>
+      </span>
+    </div>`;
+  pollenContainer.innerHTML += settingElm;
+};
+
+//Temp code for testing
+const settingsButton = document.getElementById("settings");
+settingsButton.addEventListener("click", pollenSettings);
+
+const homeBtn = document.getElementById("home");
+homeBtn.addEventListener("click", () => {
+  buildPollen(pollenDataArray);
+});
+
+console.log(pollenDataArray);
