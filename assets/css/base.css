@@ -1,0 +1,15 @@
+@import url(animations.css);
+@import url(header.css);
+@import url(main.css);
+@import url(footer.css);
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.main-container {
+  margin: 0 auto;
+  padding: 0;
+  font-family: sans-serif;
+}
