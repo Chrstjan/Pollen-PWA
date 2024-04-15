@@ -1,6 +1,33 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
 
+const saveLocationData = (locationData) => {
+  let mySerializedData = JSON.stringify(locationData);
+  localStorage.setItem("myLocations", mySerializedData);
+};
+
+const defineStorage = () => {
+  let myLocations = localStorage.getItem("myLocations");
+
+  if (!myLocations) {
+    let newMyLocations = {
+      locations: [],
+    };
+
+    saveLocationData(newMyLocations);
+  } else {
+    let myData = JSON.parse(myLocations);
+  }
+};
+
+defineStorage();
+
+const getSavedLocations = () => {
+  let myLocationStr = localStorage.getItem("myLocations");
+  let myLocationsData = JSON.parse(myLocationStr);
+  return myLocationsData;
+};
+
 export const getLocation = () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -36,4 +63,6 @@ const showPositionError = (error) => {
 const recivedLocationName = (locationName) => {
   console.log(locationName);
   console.log(locationName.address.town);
+
+  saveLocationData(locationName.address); //.address.town || .address.city
 };

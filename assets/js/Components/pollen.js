@@ -21,6 +21,7 @@ const recivedPollenData = (pollenData) => {
 
   timeStamps.map((timestamp, index) => {
     let hourDataObjects = {};
+    //Used for getting the current hour and minute for a new time format
     const date = new Date(timestamp);
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -28,6 +29,7 @@ const recivedPollenData = (pollenData) => {
     //Creating new data objects for each hourly pollen
     //Each data object get the pollen type and the corresponding timestamp from the 24 hour array
     hourDataObjects.time = timestamp;
+    //Time format for view code
     hourDataObjects.formattedTime = formattedTime;
     hourDataObjects.alder_pollen = pollenData.hourly.alder_pollen[index];
     hourDataObjects.birch_pollen = pollenData.hourly.birch_pollen[index];
