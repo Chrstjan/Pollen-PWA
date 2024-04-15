@@ -12,7 +12,7 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
-const recivedPollenData = async (pollenData) => {
+const recivedPollenData = (pollenData) => {
   pollenDataArray = pollenData;
   let viewData = [];
   // pollenData.current.img = "";
@@ -135,15 +135,25 @@ const pollenSettings = () => {
       </span>
     </div>`;
   pollenContainer.innerHTML += settingElm;
+
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      buildPollen(pollenDataArray);
+    });
+  });
+
+  // Build pollen view after checkboxes are created
+  buildPollen(pollenDataArray);
 };
 
 //Temp code for testing
 const settingsButton = document.getElementById("settings");
 settingsButton.addEventListener("click", pollenSettings);
 
-const homeBtn = document.getElementById("home");
-homeBtn.addEventListener("click", () => {
-  buildPollen(pollenDataArray);
-});
+// const homeBtn = document.getElementById("home");
+// homeBtn.addEventListener("click", () => {
+//   buildPollen(pollenDataArray);
+// });
 
-console.log(pollenDataArray);
+// console.log(pollenDataArray);
