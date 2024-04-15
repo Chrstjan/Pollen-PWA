@@ -1,0 +1,11 @@
+#app {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: center;
+  align-items: center; */
+  overflow: auto;
+}
+
+#app figure:first-of-type {
+  display: none;
+}

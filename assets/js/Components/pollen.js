@@ -10,7 +10,8 @@ export const getPollenData = async (lat, long) => {
 
 const recivedPollenData = (pollenData) => {
   let viewData = [];
-  viewData.push(pollenData);
+  pollenData.current.img = "";
+  viewData.push(pollenData.current);
 
   //   console.log(viewData);
 
@@ -20,9 +21,14 @@ const recivedPollenData = (pollenData) => {
 
   timeStamps.map((timestamp, index) => {
     let hourDataObjects = {};
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedTime = `${hours}:${minutes < 10 ? "0" : ""}${minutes}`;
     //Creating new data objects for each hourly pollen
     //Each data object get the pollen type and the corresponding timestamp from the 24 hour array
     hourDataObjects.time = timestamp;
+    hourDataObjects.formattedTime = formattedTime;
     hourDataObjects.alder_pollen = pollenData.hourly.alder_pollen[index];
     hourDataObjects.birch_pollen = pollenData.hourly.birch_pollen[index];
     hourDataObjects.grass_pollen = pollenData.hourly.grass_pollen[index];
@@ -33,16 +39,56 @@ const recivedPollenData = (pollenData) => {
     hourData.push(hourDataObjects);
   });
 
-  //Build current pollen
-  buildCurrentPollen(viewData);
-  //Build hourly pollen
-  buildHourlyPollen(hourData);
-};
+  //Gets the current date
+  const curDay = new Date();
+  //Gets the current Hour
+  const curHour = curDay.getHours();
+  console.log(curHour);
 
-const buildCurrentPollen = (pollen) => {
-  console.log(pollen);
+  const filteredHourlyData = hourData.filter((data) => {
+    const dataTime = new Date(data.time);
+    const dataHour = dataTime.getHours();
+    return dataHour >= curHour && dataHour <= curHour + 4;
+  });
+
+  //Build current pollen
+  //   buildCurrentPollen(viewData);
+  //Build hourly pollen
+  //   buildHourlyPollen(hourData);
+  buildHourlyPollen(filteredHourlyData);
 };
 
 const buildHourlyPollen = (pollen) => {
   console.log(pollen);
+  const pollenContainer = document.getElementById("app");
+
+  // Iterate over each pollen type
+  Object.keys(pollen[0]).forEach((pollenType) => {
+    // Skip iteration if the current key is 'time'
+    if (pollenType === "time") return;
+
+    // Create a figure for the current pollen type
+    let pollenFigure = `<figure>
+      <header>
+          <h3>${pollenType.replace("_pollen", "")}</h3>
+      </header>
+      <figcaption>`;
+
+    // Iterate over hourly data to populate the pollen values for the current type
+    pollen.forEach((currentPollen) => {
+      pollenFigure += `
+          <span>
+              <p>${currentPollen.formattedTime}</p>
+              <p>${currentPollen[pollenType]}</p>
+          </span>`;
+    });
+
+    // Close figure tag
+    pollenFigure += `
+      </figcaption>
+    </figure>`;
+
+    // Append the figure to the container
+    pollenContainer.innerHTML += pollenFigure;
+  });
 };
