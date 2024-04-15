@@ -1,3 +1,7 @@
-import { logMessage } from "./Components/app.js";
+// import { getPollenData } from "./Components/pollen.js";
 
-logMessage();
+import { getLocation } from "./Components/pollen.js";
+
+// getPollenData();
+
+getLocation();
