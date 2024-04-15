@@ -1,7 +1,3 @@
-// import { getPollenData } from "./Components/pollen.js";
-
-import { getLocation } from "./Components/pollen.js";
-
-// getPollenData();
+import { getLocation } from "./Components/userLocation.js";
 
 getLocation();
