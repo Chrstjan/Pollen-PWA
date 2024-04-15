@@ -12,15 +12,20 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
+let pollenTypesToFilter = [];
+console.log(pollenTypesToFilter);
+
+let filteredPollenData = [];
+
+let filteredHourlyData = [];
+
 const recivedPollenData = (pollenData) => {
-  pollenDataArray = pollenData;
   let viewData = [];
-  // pollenData.current.img = "";
-  viewData.push(pollenDataArray.current);
+  viewData.push(pollenData.current);
 
   //   console.log(viewData);
 
-  let timeStamps = pollenDataArray.hourly.time;
+  let timeStamps = pollenData.hourly.time;
 
   let hourData = [];
 
@@ -36,14 +41,12 @@ const recivedPollenData = (pollenData) => {
     hourDataObjects.time = timestamp;
     //Time format for view code
     hourDataObjects.formattedTime = formattedTime;
-    hourDataObjects.alder_pollen = pollenDataArray.hourly.alder_pollen[index];
-    hourDataObjects.birch_pollen = pollenDataArray.hourly.birch_pollen[index];
-    hourDataObjects.grass_pollen = pollenDataArray.hourly.grass_pollen[index];
-    hourDataObjects.mugwort_pollen =
-      pollenDataArray.hourly.mugwort_pollen[index];
-    hourDataObjects.olive_pollen = pollenDataArray.hourly.olive_pollen[index];
-    hourDataObjects.ragweed_pollen =
-      pollenDataArray.hourly.ragweed_pollen[index];
+    hourDataObjects.alder_pollen = pollenData.hourly.alder_pollen[index];
+    hourDataObjects.birch_pollen = pollenData.hourly.birch_pollen[index];
+    hourDataObjects.grass_pollen = pollenData.hourly.grass_pollen[index];
+    hourDataObjects.mugwort_pollen = pollenData.hourly.mugwort_pollen[index];
+    hourDataObjects.olive_pollen = pollenData.hourly.olive_pollen[index];
+    hourDataObjects.ragweed_pollen = pollenData.hourly.ragweed_pollen[index];
 
     hourData.push(hourDataObjects);
   });
@@ -54,15 +57,19 @@ const recivedPollenData = (pollenData) => {
   const curHour = curDay.getHours();
   console.log(curHour);
 
-  const filteredHourlyData = hourData.filter((data) => {
+  filteredHourlyData = hourData.filter((data) => {
     const dataTime = new Date(data.time);
     const dataHour = dataTime.getHours();
     return dataHour >= curHour && dataHour <= curHour + 4;
   });
 
+  pollenDataArray.push(filteredHourlyData);
+
   //Build pollen view
   buildPollen(filteredHourlyData);
 };
+
+console.log(pollenDataArray);
 
 const buildPollen = (pollen) => {
   console.log(pollen);
@@ -99,9 +106,22 @@ const buildPollen = (pollen) => {
   });
 };
 
-const pollenSettings = () => {
-  console.log("hello");
+const updateFilteredPollen = () => {
+  filteredPollenData = filteredHourlyData.filter((data) => {
+    return pollenTypesToFilter.every((pollenType) => {
+      // Get the checkbox status for the current pollen type
+      const checkboxId = `${pollenType}Checkbox`;
+      const isChecked = document.getElementById(checkboxId).checked;
 
+      // Include the data if the checkbox is checked, exclude otherwise
+      return isChecked;
+    });
+  });
+
+  buildPollen(filteredPollenData);
+};
+
+const pollenSettings = () => {
   pollenContainer.innerHTML = "";
 
   let settingElm = `
@@ -134,26 +154,38 @@ const pollenSettings = () => {
         <input type="checkbox" id="ragweedCheckbox" checked>
       </span>
     </div>`;
-  pollenContainer.innerHTML += settingElm;
+  pollenContainer.innerHTML = settingElm;
 
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
-      buildPollen(pollenDataArray);
+      const pollenType = checkbox.id.replace("Checkbox", ""); // Extract the pollen type from the checkbox ID
+      const isChecked = checkbox.checked;
+
+      if (!isChecked) {
+        // Remove the pollen type from the array if unchecked
+        const index = pollenTypesToFilter.indexOf(pollenType);
+        if (index !== -1) {
+          pollenTypesToFilter.splice(index, 1);
+        }
+      } else {
+        // Add the pollen type to the array if checked
+        pollenTypesToFilter.push(pollenType);
+      }
+
+      // Call a function to update the pollen view with the filtered data
+      updateFilteredPollen();
     });
   });
-
-  // Build pollen view after checkboxes are created
-  buildPollen(pollenDataArray);
 };
 
-//Temp code for testing
+//Building the settings view
 const settingsButton = document.getElementById("settings");
 settingsButton.addEventListener("click", pollenSettings);
 
-// const homeBtn = document.getElementById("home");
-// homeBtn.addEventListener("click", () => {
-//   buildPollen(pollenDataArray);
-// });
-
-// console.log(pollenDataArray);
+//Building the pollen view
+const homeBtn = document.getElementById("home");
+homeBtn.addEventListener("click", () => {
+  buildPollen(pollenDataArray[0]);
+});

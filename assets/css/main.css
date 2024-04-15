@@ -12,6 +12,7 @@ main {
   /* justify-content: center;
   align-items: center; */
   overflow: auto;
+  position: relative;
 }
 
 #app figure:first-of-type {
