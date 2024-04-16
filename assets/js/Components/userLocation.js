@@ -1,5 +1,6 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
+// import { createMap } from "./map.js";
 
 function defineStorage() {
   let myLocations = localStorage.getItem("myLocations");
@@ -82,6 +83,7 @@ const recivedPosition = (position) => {
 
   getUserLocationName(position.coords.latitude, position.coords.longitude);
   getPollenData(position.coords.latitude, position.coords.longitude);
+  // createMap(position.coords.latitude, position.coords.longitude);
 };
 
 const showPositionError = (error) => {
