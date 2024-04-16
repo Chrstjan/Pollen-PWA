@@ -98,15 +98,26 @@ const recivedLocationName = (locationName) => {
 const buildLocations = () => {
   const locationContainer = document.getElementById("locationContainer");
   const locationContainerElm = document.createElement("div");
+  locationContainerElm.classList.add("location");
 
-  let locations = getSavedLocations();
-  console.log(locations);
+  let savedLocalLocations = getSavedLocations();
+  console.log(savedLocalLocations);
 
   let currentLocationElm = `
     <header>
-      <h2>${locations.currentLocation.town}</h2>
+      <h2>${savedLocalLocations.currentLocation.town}</h2>
     </header>`;
+
+  let locationsSelect = "<select>";
+  let emptyOption = "<option></option>";
+  locationsSelect += emptyOption;
+  savedLocalLocations.locations.forEach((location) => {
+    locationsSelect += `<option>${location.town}</option>`;
+  });
+  locationsSelect += "</select>";
+
   locationContainerElm.innerHTML += currentLocationElm;
+  locationContainerElm.innerHTML += locationsSelect;
   locationContainer.appendChild(locationContainerElm);
 };
 
