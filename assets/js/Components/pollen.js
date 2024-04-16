@@ -13,8 +13,7 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
-let pollenTypesToFilter = [];
-console.log(pollenTypesToFilter);
+let selectedPollenTypes = []; //Used for storing selected pollens
 
 const recivedPollenData = (pollenData) => {
   let viewData = [];
@@ -115,27 +114,18 @@ const buildPollen = (pollen) => {
   });
 };
 
-function filterDataByCheckbox(data, checkedPollenTypes) {
-  // Filter the data based on the checked pollen types
+// Filter data based on selected pollen types
+function filterDataByCheckbox(data, selectedTypes) {
   return data.filter((dataObject) => {
-    // Check if all checked pollen types are present in the current data object
-    return checkedPollenTypes.every((pollenType) =>
+    // Check if all selected pollen types are present in the current data object
+    return selectedTypes.every((pollenType) =>
       dataObject.hasOwnProperty(pollenType)
     );
   });
 }
 
-function updateData(data, checkedBoxes) {
-  const selectedPollenTypes = checkedBoxes
-    .filter((box) => box.checked)
-    .map((box) => box.id.replace("Checkbox", ""));
-
-  if (selectedPollenTypes.length === 0) {
-    // Show all pollen types (or handle as needed)
-    return data;
-  }
-
-  // Use filterDataByCheckbox for filtering
+function updateData(data) {
+  // Use filterDataByCheckbox for filtering based on selectedPollenTypes
   return filterDataByCheckbox(data, selectedPollenTypes);
 }
 
@@ -173,15 +163,18 @@ const pollenSettings = async () => {
       const pollenType = checkbox.id.replace("Checkbox", "");
       const isChecked = checkbox.checked;
 
-      const updatedCheckboxes = [...checkboxes]
-        .filter((box) => box.checked)
-        .map((box) => box.id.replace("Checkbox", ""));
+      if (isChecked) {
+        selectedPollenTypes.push(pollenType);
+      } else {
+        // Remove pollen type from selectedPollenTypes when unchecked
+        const index = selectedPollenTypes.indexOf(pollenType);
+        if (index > -1) {
+          selectedPollenTypes.splice(index, 1);
+        }
+      }
 
       // Update filtered data using updateData
-      filteredHourlyData = await updateData(
-        filteredHourlyData,
-        updatedCheckboxes
-      );
+      filteredHourlyData = updateData(filteredHourlyData);
       buildPollen(filteredHourlyData); // Pass updated data to buildPollen
     });
   });
@@ -189,11 +182,13 @@ const pollenSettings = async () => {
 
 pollenSettings();
 
+console.log(selectedPollenTypes);
+
 //Building the settings view
 const settingsButton = document.getElementById("settings");
 settingsButton.addEventListener("click", pollenSettings);
 
-//Building the pollen view
+//Building the pollen view (same as before)
 const homeBtn = document.getElementById("home");
 homeBtn.addEventListener("click", () => {
   buildPollen(filteredHourlyData);
