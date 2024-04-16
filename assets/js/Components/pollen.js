@@ -115,62 +115,55 @@ const buildPollen = (pollen) => {
   });
 };
 
-function updateData(data, pollenType, isChecked) {
-  // Make a copy to avoid modifying original data
-  const updatedData = [...data];
+function filterDataByCheckbox(data, checkedPollenTypes) {
+  // Filter the data based on the checked pollen types
+  return data.filter((dataObject) => {
+    // Check if all checked pollen types are present in the current data object
+    return checkedPollenTypes.every((pollenType) =>
+      dataObject.hasOwnProperty(pollenType)
+    );
+  });
+}
 
-  if (isChecked) {
-    // Add the key-value pair only if checked
-    updatedData.forEach((dataPoint) => {
-      if (!dataPoint.hasOwnProperty(pollenType)) {
-        dataPoint[pollenType] = true; // Or any placeholder value indicating data is present
-      }
-    });
-  } else {
-    // Remove the key-value pair if unchecked (logic remains the same)
-    updatedData.forEach((dataPoint) => {
-      if (dataPoint.hasOwnProperty(pollenType) && dataPoint[pollenType]) {
-        delete dataPoint[pollenType];
-      }
-    });
+function updateData(data, checkedBoxes) {
+  const selectedPollenTypes = checkedBoxes
+    .filter((box) => box.checked)
+    .map((box) => box.id.replace("Checkbox", ""));
+
+  if (selectedPollenTypes.length === 0) {
+    // Show all pollen types (or handle as needed)
+    return data;
   }
 
-  return updatedData;
+  // Use filterDataByCheckbox for filtering
+  return filterDataByCheckbox(data, selectedPollenTypes);
 }
 
 const pollenSettings = async () => {
   pollenContainer.innerHTML = "";
 
+  // Get all pollen types from the first data object (assuming consistent structure)
+  const pollenTypes = Object.keys(filteredHourlyData[0]).filter(
+    (key) => key !== "time"
+  );
+
   let settingElm = `
     <div>
       <header>
         <h2>Mine Allergier</h2>
-      </header>
+      </header>`;
+
+  // Generate checkbox elements for each pollen type
+  pollenTypes.forEach((pollenType) => {
+    settingElm += `
       <span>
-        <p>alder pollen</p>
-        <input type="checkbox" id="alderCheckbox" checked>
-      </span>
-      <span>
-        <p>birch pollen</p>
-        <input type="checkbox" id="birchCheckbox" checked>
-      </span>
-      <span>
-        <p>grass pollen</p>
-        <input type="checkbox" id="grassCheckbox" checked>
-      </span>
-      <span>
-        <p>mugwort pollen</p>
-        <input type="checkbox" id="mugwortCheckbox" checked>
-      </span>
-      <span>
-        <p>olive pollen</p>
-        <input type="checkbox" id="oliveCheckbox" checked>
-      </span>
-      <span>
-        <p>ragweed pollen</p>
-        <input type="checkbox" id="ragweedCheckbox" checked>
-      </span>
-    </div>`;
+        <p>${pollenType.replace("_pollen", "")}</p>
+        <input type="checkbox" id="${pollenType}Checkbox" checked>
+      </span>`;
+  });
+
+  settingElm += `</div>`;
+
   pollenContainer.innerHTML = settingElm;
 
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -180,12 +173,16 @@ const pollenSettings = async () => {
       const pollenType = checkbox.id.replace("Checkbox", "");
       const isChecked = checkbox.checked;
 
+      const updatedCheckboxes = [...checkboxes]
+        .filter((box) => box.checked)
+        .map((box) => box.id.replace("Checkbox", ""));
+
+      // Update filtered data using updateData
       filteredHourlyData = await updateData(
         filteredHourlyData,
-        pollenType,
-        isChecked
+        updatedCheckboxes
       );
-      buildPollen(filteredHourlyData); // Update view with modified data after checkbox change
+      buildPollen(filteredHourlyData); // Pass updated data to buildPollen
     });
   });
 };
