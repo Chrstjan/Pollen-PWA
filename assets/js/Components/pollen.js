@@ -2,7 +2,8 @@ import { myFetchData } from "../Utils/apiUtils.js";
 
 const pollenContainer = document.getElementById("app");
 
-let pollenDataArray = [];
+// let pollenDataArray = [];
+let filteredHourlyData = [];
 
 export const getPollenData = async (lat, long) => {
   console.log("Pollen!!");
@@ -14,10 +15,6 @@ export const getPollenData = async (lat, long) => {
 
 let pollenTypesToFilter = [];
 console.log(pollenTypesToFilter);
-
-let filteredPollenData = [];
-
-let filteredHourlyData = [];
 
 const recivedPollenData = (pollenData) => {
   let viewData = [];
@@ -63,15 +60,22 @@ const recivedPollenData = (pollenData) => {
     return dataHour >= curHour && dataHour <= curHour + 4;
   });
 
-  pollenDataArray.push(filteredHourlyData);
+  console.log(filteredHourlyData);
+
+  // pollenDataArray.push(filteredHourlyData);
 
   //Build pollen view
   buildPollen(filteredHourlyData);
 };
 
-console.log(pollenDataArray);
+// console.log(pollenDataArray);
 
 const buildPollen = (pollen) => {
+  if (!pollen || pollen.length === 0) {
+    console.error("pollenDataArray is empty");
+    return; // Exit the function if no data
+  }
+
   console.log(pollen);
 
   pollenContainer.innerHTML = "";
@@ -80,48 +84,61 @@ const buildPollen = (pollen) => {
     // Skip iteration if the current key is 'time'
     if (pollenType === "time") return;
 
-    // Create a figure for the current pollen type
-    let pollenFigure = `<figure>
-      <header>
+    // **Declare included here**
+    let included = pollen[0].hasOwnProperty(pollenType);
+
+    if (included) {
+      // Create a figure for the current pollen type (if data is included)
+      let pollenFigure = `<figure>
+        <header>
           <h3>${pollenType.replace("_pollen", "")}</h3>
-      </header>
-      <figcaption>`;
+        </header>
+        <figcaption>`;
 
-    // Iterate over hourly data to populate the pollen values for the current type
-    pollen.forEach((currentPollen) => {
-      pollenFigure += `
+      // Iterate over hourly data to populate the pollen values for the current type
+      pollen.forEach((currentPollen) => {
+        pollenFigure += `
           <span>
-              <p>${currentPollen.formattedTime}</p>
-              <p>${currentPollen[pollenType]}</p>
+            <p>${currentPollen.formattedTime}</p>
+            <p>${currentPollen[pollenType]}</p>
           </span>`;
-    });
+      });
 
-    // Close figure tag
-    pollenFigure += `
-      </figcaption>
-    </figure>`;
+      // Close figure tag
+      pollenFigure += `
+        </figcaption>
+      </figure>`;
 
-    // Append the figure to the container
-    pollenContainer.innerHTML += pollenFigure;
+      // Append the figure to the container
+      pollenContainer.innerHTML += pollenFigure;
+    }
   });
 };
 
-const updateFilteredPollen = () => {
-  filteredPollenData = filteredHourlyData.filter((data) => {
-    return pollenTypesToFilter.every((pollenType) => {
-      // Get the checkbox status for the current pollen type
-      const checkboxId = `${pollenType}Checkbox`;
-      const isChecked = document.getElementById(checkboxId).checked;
+function updateData(data, pollenType, isChecked) {
+  // Make a copy to avoid modifying original data
+  const updatedData = [...data];
 
-      // Include the data if the checkbox is checked, exclude otherwise
-      return isChecked;
+  if (isChecked) {
+    // Add the key-value pair only if checked
+    updatedData.forEach((dataPoint) => {
+      if (!dataPoint.hasOwnProperty(pollenType)) {
+        dataPoint[pollenType] = true; // Or any placeholder value indicating data is present
+      }
     });
-  });
+  } else {
+    // Remove the key-value pair if unchecked (logic remains the same)
+    updatedData.forEach((dataPoint) => {
+      if (dataPoint.hasOwnProperty(pollenType) && dataPoint[pollenType]) {
+        delete dataPoint[pollenType];
+      }
+    });
+  }
 
-  buildPollen(filteredPollenData);
-};
+  return updatedData;
+}
 
-const pollenSettings = () => {
+const pollenSettings = async () => {
   pollenContainer.innerHTML = "";
 
   let settingElm = `
@@ -159,26 +176,21 @@ const pollenSettings = () => {
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
   checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      const pollenType = checkbox.id.replace("Checkbox", ""); // Extract the pollen type from the checkbox ID
+    checkbox.addEventListener("change", async () => {
+      const pollenType = checkbox.id.replace("Checkbox", "");
       const isChecked = checkbox.checked;
 
-      if (!isChecked) {
-        // Remove the pollen type from the array if unchecked
-        const index = pollenTypesToFilter.indexOf(pollenType);
-        if (index !== -1) {
-          pollenTypesToFilter.splice(index, 1);
-        }
-      } else {
-        // Add the pollen type to the array if checked
-        pollenTypesToFilter.push(pollenType);
-      }
-
-      // Call a function to update the pollen view with the filtered data
-      updateFilteredPollen();
+      filteredHourlyData = await updateData(
+        filteredHourlyData,
+        pollenType,
+        isChecked
+      );
+      buildPollen(filteredHourlyData); // Update view with modified data after checkbox change
     });
   });
 };
+
+pollenSettings();
 
 //Building the settings view
 const settingsButton = document.getElementById("settings");
@@ -187,5 +199,6 @@ settingsButton.addEventListener("click", pollenSettings);
 //Building the pollen view
 const homeBtn = document.getElementById("home");
 homeBtn.addEventListener("click", () => {
-  buildPollen(pollenDataArray[0]);
+  buildPollen(filteredHourlyData);
+  console.log("Building pollen!");
 });
