@@ -80,58 +80,27 @@ const createRetardedCheckboxes = () => {
     let included = filteredHourlyData[0].hasOwnProperty(pollenType);
 
     if (included) {
-      // Create a figure for the current pollen type (if data is included)
-      let pollenFigure = document.createElement("figure");
-      pollenFigure.classList.add("pollen-figure");
-      pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
+      // Create a p tag for the current pollen type
+      let pTag = document.createElement("p");
+      pTag.textContent = pollenType.replace("_pollen", "");
+      pollenContainer.appendChild(pTag);
 
-      let header = document.createElement("header");
-      let h3 = document.createElement("h3");
-      h3.textContent = pollenType.replace("_pollen", "");
-      header.appendChild(h3);
-      pollenFigure.appendChild(header);
-
-      let figcaption = document.createElement("figcaption");
-
-      // Iterate over hourly data to populate
-      filteredHourlyData.forEach((currentPollen) => {
-        let span = document.createElement("span");
-        let p1 = document.createElement("p");
-        p1.textContent = currentPollen.formattedTime;
-        let p2 = document.createElement("p");
-        p2.textContent = currentPollen[pollenType];
-        span.appendChild(p1);
-        span.appendChild(p2);
-        figcaption.appendChild(span);
-      });
-
-      // Append figcaption to figure
-      pollenFigure.appendChild(figcaption);
-
-      // Append the figure to the container
-      pollenContainer.appendChild(pollenFigure);
-
-      // Add a checkbox for each figure, excluding formattedTime
+      // Add a checkbox for each pollen type
       let checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = pollenType;
       checkbox.classList.add("pollen-checkbox");
       checkbox.setAttribute("data-pollen", pollenType);
-      checkbox.checked = true;
+      // Get saved state from local storage or default to true if not found
+      let myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
+      checkbox.checked = myPollen[pollenType] === false ? false : true;
       pollenContainer.appendChild(checkbox);
 
-      // Add event listener to checkbox
+      // Add event listener to save checkbox state
       checkbox.addEventListener("change", (event) => {
         const isChecked = event.target.checked;
         const pollenType = event.target.getAttribute("data-pollen");
-        const figure = document.querySelector(`.pollen-figure.${pollenType}`);
-        if (isChecked) {
-          figure.style.display = "block";
-        } else {
-          figure.style.display = "none";
-          // Save the unchecked checkbox state to local storage
-          saveCheckboxState(pollenType, isChecked);
-        }
+        saveCheckboxState(pollenType, isChecked);
       });
     }
   });
@@ -191,6 +160,14 @@ const buildPollen = (pollen) => {
 
       // Append the figure to the container
       pollenContainer.appendChild(pollenFigure);
+
+      // Add display style based on saved checkbox state
+      let myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
+      if (myPollen[pollenType] === false) {
+        pollenFigure.style.display = "none";
+      } else {
+        pollenFigure.style.display = "block";
+      }
     }
   });
 };
