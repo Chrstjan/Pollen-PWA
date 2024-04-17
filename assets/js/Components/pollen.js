@@ -1,4 +1,7 @@
 import { myFetchData } from "../Utils/apiUtils.js";
+import { definePollenStorage } from "./localStorage.js";
+
+definePollenStorage();
 
 const pollenContainer = document.getElementById("app");
 
@@ -16,6 +19,7 @@ export const getPollenData = async (lat, long) => {
 let selectedPollenTypes = []; //Used for storing selected pollens
 
 const recivedPollenData = (pollenData) => {
+  console.log(pollenData);
   let viewData = [];
   viewData.push(pollenData.current);
 
@@ -82,7 +86,7 @@ const buildPollen = (pollen) => {
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time'
     if (pollenType === "time") return;
-
+ 
     // **Declare included here**
     let included = pollen[0].hasOwnProperty(pollenType);
 
@@ -99,7 +103,7 @@ const buildPollen = (pollen) => {
         pollenFigure += `
           <span>
             <p>${currentPollen.formattedTime}</p>
-            <p>${currentPollen[pollenType]}</p>
+            <p>${currentPollen[pollenType]}</p> 
           </span>`;
       });
 
@@ -115,19 +119,19 @@ const buildPollen = (pollen) => {
 };
 
 // Filter data based on selected pollen types
-function filterDataByCheckbox(data, selectedTypes) {
-  return data.filter((dataObject) => {
-    // Check if all selected pollen types are present in the current data object
-    return selectedTypes.every((pollenType) =>
-      dataObject.hasOwnProperty(pollenType)
-    );
-  });
-}
+// function filterDataByCheckbox(data, selectedTypes) {
+//   return data.filter((dataObject) => {
+//     // Check if all selected pollen types are present in the current data object
+//     return selectedTypes.every((pollenType) =>
+//       dataObject.hasOwnProperty(pollenType)
+//     );
+//   });
+// }
 
-function updateData(data) {
-  // Use filterDataByCheckbox for filtering based on selectedPollenTypes
-  return filterDataByCheckbox(data, selectedPollenTypes);
-}
+// function updateData(data) {
+//   // Use filterDataByCheckbox for filtering based on selectedPollenTypes
+//   return filterDataByCheckbox(data, selectedPollenTypes);
+// }
 
 const pollenSettings = async () => {
   pollenContainer.innerHTML = "";

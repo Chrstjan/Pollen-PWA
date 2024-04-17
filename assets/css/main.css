@@ -11,12 +11,11 @@
 }
 
 #app {
-  display: flex;
-  flex-direction: row;
+  /* display: flex;
+  flex-direction: row; */
   /* justify-content: center;
   align-items: center; */
-  overflow: auto;
-  position: relative;
+  /* position: relative; */
 }
 
 #app figure:first-of-type {
@@ -33,6 +32,15 @@
 #app figure figcaption span p:last-of-type {
   background: lightblue;
 }
+
+#app div span:first-of-type {
+  display: none;
+}
+
+/* #navigation {
+  position: absolute;
+  bottom: 0;
+} */
 
 #navigation div {
   width: 100vw;
