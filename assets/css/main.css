@@ -1,0 +1,63 @@
+#locationContainer .location {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  background: #4ba598;
+  color: #fff;
+}
+
+.main-container {
+}
+
+#app {
+  display: flex;
+  /* flex-direction: row;
+  justify-content: center; */
+  align-items: center;
+  overflow: auto;
+  position: relative;
+}
+
+#app figure:first-of-type {
+  /* display: none; */
+}
+
+#app figure figcaption span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#app figure figcaption span p:last-of-type {
+  background: lightblue;
+}
+
+#app div span:first-of-type {
+  display: none;
+}
+
+/* #navigation {
+  position: absolute;
+  bottom: 0;
+} */
+
+#navigation div {
+  width: 100vw;
+  background: #4ba598;
+  height: 10vh;
+}
+
+#navigation div figure {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#navigation div figure img {
+  padding-top: 0.7rem;
+  width: 10vw;
+  filter: invert(100%);
+}
