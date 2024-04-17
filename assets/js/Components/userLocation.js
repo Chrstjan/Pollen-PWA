@@ -1,6 +1,6 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
-// import { createMap } from "./map.js";
+import { createMap } from "./map.js";
 
 function defineStorage() {
   let myLocations = localStorage.getItem("myLocations");
@@ -78,12 +78,15 @@ const getUserLocationName = async (lat, long) => {
 };
 
 const recivedPosition = (position) => {
+  const mapBtn = document.getElementById("map");
   //   console.log("latitude:" + position.coords.latitude);
   //   console.log("longitude:" + position.coords.longitude);
 
   getUserLocationName(position.coords.latitude, position.coords.longitude);
   getPollenData(position.coords.latitude, position.coords.longitude);
-  // createMap(position.coords.latitude, position.coords.longitude);
+  mapBtn.addEventListener("click", () => {
+    createMap(position.coords.latitude, position.coords.longitude);
+  })
 };
 
 const showPositionError = (error) => {
@@ -107,14 +110,14 @@ const buildLocations = () => {
 
   let currentLocationElm = `
     <header>
-      <h2>${savedLocalLocations.currentLocation.town}</h2>
+      <h2>${savedLocalLocations.currentLocation.city || savedLocalLocations.currentLocation.town}</h2>
     </header>`;
 
   let locationsSelect = "<select>";
   let emptyOption = "<option></option>";
   locationsSelect += emptyOption;
   savedLocalLocations.locations.forEach((location) => {
-    locationsSelect += `<option>${location.town}</option>`;
+    locationsSelect += `<option>${location.city || location.town}</option>`;
   });
   locationsSelect += "</select>";
 
