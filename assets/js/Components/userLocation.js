@@ -43,7 +43,7 @@ const showPositionError = (error) => {
 
 const recivedLocationName = (locationName) => {
   console.log(locationName);
-  console.log(locationName.address.town);
+  console.log(locationName.address.town || locationName.address.city);
 
   saveLocationData(locationName.address); //.address.town || .address.city
 };
