@@ -11,15 +11,16 @@
 }
 
 #app {
-  /* display: flex;
-  flex-direction: row; */
-  /* justify-content: center;
-  align-items: center; */
-  /* position: relative; */
+  display: flex;
+  /* flex-direction: row;
+  justify-content: center; */
+  align-items: center;
+  overflow: auto;
+  position: relative;
 }
 
 #app figure:first-of-type {
-  display: none;
+  /* display: none; */
 }
 
 #app figure figcaption span {

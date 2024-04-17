@@ -69,6 +69,80 @@ const recivedPollenData = (pollenData) => {
 
 // console.log(pollenDataArray);
 
+const createRetardedCheckboxes = () => {
+  pollenContainer.innerHTML = "";
+  // Iterate over each pollen type
+  Object.keys(filteredHourlyData[0]).forEach((pollenType) => {
+    // Skip iteration if the current key is 'time' or 'formattedTime'
+    if (pollenType === "time" || pollenType === "formattedTime") return;
+
+    // **Declare included here**
+    let included = filteredHourlyData[0].hasOwnProperty(pollenType);
+
+    if (included) {
+      // Create a figure for the current pollen type (if data is included)
+      let pollenFigure = document.createElement("figure");
+      pollenFigure.classList.add("pollen-figure");
+      pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
+
+      let header = document.createElement("header");
+      let h3 = document.createElement("h3");
+      h3.textContent = pollenType.replace("_pollen", "");
+      header.appendChild(h3);
+      pollenFigure.appendChild(header);
+
+      let figcaption = document.createElement("figcaption");
+
+      // Iterate over hourly data to populate
+      filteredHourlyData.forEach((currentPollen) => {
+        let span = document.createElement("span");
+        let p1 = document.createElement("p");
+        p1.textContent = currentPollen.formattedTime;
+        let p2 = document.createElement("p");
+        p2.textContent = currentPollen[pollenType];
+        span.appendChild(p1);
+        span.appendChild(p2);
+        figcaption.appendChild(span);
+      });
+
+      // Append figcaption to figure
+      pollenFigure.appendChild(figcaption);
+
+      // Append the figure to the container
+      pollenContainer.appendChild(pollenFigure);
+
+      // Add a checkbox for each figure, excluding formattedTime
+      let checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = pollenType;
+      checkbox.classList.add("pollen-checkbox");
+      checkbox.setAttribute("data-pollen", pollenType);
+      checkbox.checked = true;
+      pollenContainer.appendChild(checkbox);
+
+      // Add event listener to checkbox
+      checkbox.addEventListener("change", (event) => {
+        const isChecked = event.target.checked;
+        const pollenType = event.target.getAttribute("data-pollen");
+        const figure = document.querySelector(`.pollen-figure.${pollenType}`);
+        if (isChecked) {
+          figure.style.display = "block";
+        } else {
+          figure.style.display = "none";
+          // Save the unchecked checkbox state to local storage
+          saveCheckboxState(pollenType, isChecked);
+        }
+      });
+    }
+  });
+};
+
+const saveCheckboxState = (pollenType, isChecked) => {
+  const myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
+  myPollen[pollenType] = isChecked;
+  localStorage.setItem("myPollen", JSON.stringify(myPollen));
+};
+
 const buildPollen = (pollen) => {
   if (!pollen || pollen.length === 0) {
     console.error("pollenDataArray is empty");
@@ -80,56 +154,51 @@ const buildPollen = (pollen) => {
   pollenContainer.innerHTML = "";
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
-    // Skip iteration if the current key is 'time'
-    if (pollenType === "time") return;
+    // Skip iteration if the current key is 'time' or 'formattedTime'
+    if (pollenType === "time" || pollenType === "formattedTime") return;
 
     // **Declare included here**
     let included = pollen[0].hasOwnProperty(pollenType);
 
     if (included) {
       // Create a figure for the current pollen type (if data is included)
-      let pollenFigure = `<figure>
-        <header>
-          <h3>${pollenType.replace("_pollen", "")}</h3>
-        </header>
-        <figcaption>`;
+      let pollenFigure = document.createElement("figure");
+      pollenFigure.classList.add("pollen-figure");
+      pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
+
+      let header = document.createElement("header");
+      let h3 = document.createElement("h3");
+      h3.textContent = pollenType.replace("_pollen", "");
+      header.appendChild(h3);
+      pollenFigure.appendChild(header);
+
+      let figcaption = document.createElement("figcaption");
 
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
-        pollenFigure += `
-          <span>
-            <p>${currentPollen.formattedTime}</p>
-            <p>${currentPollen[pollenType]}</p> 
-          </span>`;
+        let span = document.createElement("span");
+        let p1 = document.createElement("p");
+        p1.textContent = currentPollen.formattedTime;
+        let p2 = document.createElement("p");
+        p2.textContent = currentPollen[pollenType];
+        span.appendChild(p1);
+        span.appendChild(p2);
+        figcaption.appendChild(span);
       });
 
-      // Close figure tag
-      pollenFigure += `
-        </figcaption>
-      </figure>`;
+      // Append figcaption to figure
+      pollenFigure.appendChild(figcaption);
 
       // Append the figure to the container
-      pollenContainer.innerHTML += pollenFigure;
+      pollenContainer.appendChild(pollenFigure);
     }
   });
 };
 
-// Filter data based on selected pollen types (commented out as selectedPollenTypes might be unused)
-// function filterDataByCheckbox(data, selectedTypes) {
-//   return data.filter((dataObject) => {
-//     // Check if all selected pollen types are present in the current data object
-//     return selectedTypes.every((pollenType) =>
-//       dataObject.hasOwnProperty(pollenType)
-//     );
-//   });
-// }
-
-// function updateData(data) {
-//   // Use filterDataByCheckbox for filtering based on selectedPollenTypes
-//   return filterDataByCheckbox(data, selectedPollenTypes);
-// }
-
-// Building the settings view (removed)
+const settingsIcon = document.getElementById("settings");
+settingsIcon.addEventListener("click", () => {
+  createRetardedCheckboxes();
+});
 
 //Building the pollen view (same as before)
 const homeBtn = document.getElementById("home");
