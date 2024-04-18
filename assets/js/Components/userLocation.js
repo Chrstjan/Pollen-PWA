@@ -1,6 +1,6 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
-import { createMap } from "./map.js";
+// import { createMap } from "./map.js";
 import { defineStorage,  saveLocationData, getSavedLocations } from "./localStorage.js";
 
 defineStorage();

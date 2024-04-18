@@ -20,9 +20,7 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
-let selectedPollenTypes = []; //Used for storing selected pollens (potentially unused now)
-
-const recivedPollenData = (pollenData) => {
+const recivedPollenData = (pollenData, pollenType) => {
   console.log(pollenData);
 
   currentData.push(pollenData.current);
@@ -80,6 +78,10 @@ const createRetardedCheckboxes = () => {
 
   let checkboxParentContainer = document.createElement("div");
   checkboxParentContainer.classList.add("checkboxes-container");
+
+  let settingsHeader = `<header class="settings"><h2>Mine Allergier</h2></header>`;
+
+  checkboxParentContainer.innerHTML += settingsHeader;
   // Iterate over each pollen type
   Object.keys(filteredHourlyData[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
@@ -127,7 +129,7 @@ const saveCheckboxState = (pollenType, isChecked) => {
   localStorage.setItem("myPollen", JSON.stringify(myPollen));
 };
 
-const buildHourlyPollen = (pollen) => {
+const buildCurrentPollen = (pollen) => {
   if (!pollen || pollen.length === 0) {
     console.error("pollenDataArray is empty");
     return; // Exit the function if no data
@@ -136,6 +138,8 @@ const buildHourlyPollen = (pollen) => {
   console.log(pollen);
 
   pollenContainer.innerHTML = "";
+  const pollenHeader = `<header class="pollen-header"><h2>Current Pollen</h2></header>`
+  pollenContainer.innerHTML += pollenHeader;
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
@@ -147,26 +151,52 @@ const buildHourlyPollen = (pollen) => {
     if (included) {
       // Create a figure for the current pollen type (if data is included)
       let pollenFigure = document.createElement("figure");
-      pollenFigure.classList.add("pollen-figure");
+
+      //Building hourly pollen data on figure click
+      pollenFigure.addEventListener("click", () => {
+        buildHourlyPollen(filteredHourlyData);
+        console.log("Building pollen!");
+      })
+      
+      pollenFigure.classList.add("current-pollen-figure");
       pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
 
       let header = document.createElement("header");
+      // let pollenImg = document.createElement("img");
+      // pollenImg.src = ${pollenType};
+      // header.appendChild(pollenImg);
       let h3 = document.createElement("h3");
       h3.textContent = pollenType.replace("_pollen", "");
       header.appendChild(h3);
       pollenFigure.appendChild(header);
 
       let figcaption = document.createElement("figcaption");
+      figcaption.classList.add("current-pollen");
 
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
         let span = document.createElement("span");
-        let p1 = document.createElement("p");
-        p1.textContent = currentPollen.formattedTime;
         let p2 = document.createElement("p");
         p2.textContent = currentPollen[pollenType];
-        span.appendChild(p1);
+        let shitFuck = document.createElement("div");
+        shitFuck.classList.add("pollen-amount-box");
+        shitFuck.textContent = ".";
+      
+        // Set background color based on pollen amount
+        let pollenAmount = parseInt(currentPollen[pollenType]);
+        console.log(pollenAmount);
+        if (pollenAmount <= 5) {
+          shitFuck.classList.add("low-pollen");
+        } else if (pollenAmount >= 20) {
+          shitFuck.classList.add("mid-pollen");
+        }
+         else if (pollenAmount > 20 && pollenAmount >= 30) {
+          shitFuck.classList.remove("mid-pollen");
+          shitFuck.classList.add("high-pollen");
+        }
+      
         span.appendChild(p2);
+        span.appendChild(shitFuck);
         figcaption.appendChild(span);
       });
 
@@ -187,7 +217,8 @@ const buildHourlyPollen = (pollen) => {
   });
 };
 
-const buildCurrentPollen = (pollen) => {
+
+const buildHourlyPollen = (pollen) => {
   if (!pollen || pollen.length === 0) {
     console.error("pollenDataArray is empty");
     return; // Exit the function if no data
@@ -196,6 +227,8 @@ const buildCurrentPollen = (pollen) => {
   console.log(pollen);
 
   pollenContainer.innerHTML = "";
+  const pollenHeader = `<header class="pollen-header"><h2>Hourly Pollen</h2></header>`
+  pollenContainer.innerHTML += pollenHeader;
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
@@ -207,13 +240,6 @@ const buildCurrentPollen = (pollen) => {
     if (included) {
       // Create a figure for the current pollen type (if data is included)
       let pollenFigure = document.createElement("figure");
-
-      //Building hourly pollen data on figure click
-      pollenFigure.addEventListener("click", () => {
-        buildHourlyPollen(filteredHourlyData);
-        console.log("Building pollen!");
-      })
-      
       pollenFigure.classList.add("pollen-figure");
       pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
 
@@ -228,12 +254,26 @@ const buildCurrentPollen = (pollen) => {
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
         let span = document.createElement("span");
-        let p1 = document.createElement("p");
-        p1.textContent = currentPollen.formattedTime;
         let p2 = document.createElement("p");
         p2.textContent = currentPollen[pollenType];
-        span.appendChild(p1);
+        let shitFuck = document.createElement("div");
+        shitFuck.classList.add("pollen-amount-box");
+        shitFuck.textContent = ".";
+      
+        // Set background color based on pollen amount
+        let pollenAmount = parseInt(currentPollen[pollenType]);
+        console.log(pollenAmount);
+        if (pollenAmount <= 5) {
+          shitFuck.classList.add("low-pollen");
+        } else if (pollenAmount >= 20) {
+          shitFuck.classList.add("mid-pollen");
+        }
+         else if (pollenAmount >= 40) {
+          shitFuck.classList.add("high-pollen");
+        }
+      
         span.appendChild(p2);
+        span.appendChild(shitFuck);
         figcaption.appendChild(span);
       });
 
