@@ -304,6 +304,11 @@ const hourlyPollenCallback = (pollenType) => {
 
   console.log(filteredHourlyData);
 
+  /*
+  Filtering so that it only get's the key value pairs of the pollen type name recived from buildCurrentPollen
+  Also includes the time & formattedTime key values
+  Makes a new array with data objects from the current hour & 4 hours forward 
+  */
   const clickedPollenData = filteredHourlyData.map(data => ({
     time: data.time,
     formattedTime: data.formattedTime,
