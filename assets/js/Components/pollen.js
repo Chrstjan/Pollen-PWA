@@ -1,3 +1,4 @@
+//GLOBALS
 import { myFetchData } from "../Utils/apiUtils.js";
 import { definePollenStorage } from "./localStorage.js";
 
@@ -5,12 +6,8 @@ definePollenStorage();
 
 const pollenContainer = document.getElementById("app");
 
-// let pollenDataArray = [];
 let currentData = [];
 let filteredHourlyData = [];
-
-//Getting pollen data every hour
-// setInterval(getPollenData, 3600000);
 
 export const getPollenData = async (lat, long) => {
   console.log("Pollen!!");
@@ -20,7 +17,8 @@ export const getPollenData = async (lat, long) => {
   recivedPollenData(pollenData);
 };
 
-const recivedPollenData = (pollenData, pollenType) => {
+//Sorting pollen data into hours & current
+const recivedPollenData = (pollenData) => {
   console.log(pollenData);
 
   currentData.push(pollenData.current);
@@ -71,8 +69,7 @@ const recivedPollenData = (pollenData, pollenType) => {
   buildCurrentPollen(currentData);
 };
 
-// console.log(pollenDataArray);
-
+//#region creating settings checkbox
 const createRetardedCheckboxes = () => {
   pollenContainer.innerHTML = "";
 
@@ -123,12 +120,16 @@ const createRetardedCheckboxes = () => {
   });
 };
 
+//#endregion creating settings checkbox
+
+//Saving checkboxes states to local storage
 const saveCheckboxState = (pollenType, isChecked) => {
   const myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
   myPollen[pollenType] = isChecked;
   localStorage.setItem("myPollen", JSON.stringify(myPollen));
 };
 
+//#region building current pollen
 const buildCurrentPollen = (pollen) => {
   if (!pollen || pollen.length === 0) {
     console.error("pollenDataArray is empty");
@@ -138,8 +139,9 @@ const buildCurrentPollen = (pollen) => {
   console.log(pollen);
 
   pollenContainer.innerHTML = "";
-  const pollenHeader = `<header class="pollen-header"><h2>Current Pollen</h2></header>`
+  const pollenHeader = `<header class="pollen-header"><h2>Current Pollen</h2></header>`;
   pollenContainer.innerHTML += pollenHeader;
+
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
@@ -151,57 +153,43 @@ const buildCurrentPollen = (pollen) => {
     if (included) {
       // Create a figure for the current pollen type (if data is included)
       let pollenFigure = document.createElement("figure");
+      pollenFigure.classList.add("current-pollen-figure", pollenType);
+      pollenFigure.addEventListener("click", hourlyPollenCallback);
 
-      //Building hourly pollen data on figure click
-      pollenFigure.addEventListener("click", () => {
-        buildHourlyPollen(filteredHourlyData);
-        console.log("Building pollen!");
-      })
-      
-      pollenFigure.classList.add("current-pollen-figure");
-      pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
-
+      // Building hourly pollen data on figure click
+      let figCaption = document.createElement("figcaption");
+      figCaption.classList.add("current-pollen");
       let header = document.createElement("header");
-      // let pollenImg = document.createElement("img");
-      // pollenImg.src = ${pollenType};
-      // header.appendChild(pollenImg);
       let h3 = document.createElement("h3");
       h3.textContent = pollenType.replace("_pollen", "");
       header.appendChild(h3);
-      pollenFigure.appendChild(header);
-
-      let figcaption = document.createElement("figcaption");
-      figcaption.classList.add("current-pollen");
+      figCaption.appendChild(header);
 
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
         let span = document.createElement("span");
-        let p2 = document.createElement("p");
+        let p2 = document.createElement("div");
+        p2.classList.add("pollen-amount-box");
         p2.textContent = currentPollen[pollenType];
-        let shitFuck = document.createElement("div");
-        shitFuck.classList.add("pollen-amount-box");
-        shitFuck.textContent = ".";
-      
+
         // Set background color based on pollen amount
         let pollenAmount = parseInt(currentPollen[pollenType]);
-        console.log(pollenAmount);
-        if (pollenAmount <= 5) {
-          shitFuck.classList.add("low-pollen");
-        } else if (pollenAmount >= 20) {
-          shitFuck.classList.add("mid-pollen");
+        let pollenClass = "";
+        if (pollenAmount <= 10) {
+          pollenClass = "low-pollen";
+        } else if (pollenAmount >= 20 && pollenAmount < 60) {
+          pollenClass = "mid-pollen";
+        } else if (pollenAmount >= 60) {
+          pollenClass = "high-pollen";
         }
-         else if (pollenAmount > 20 && pollenAmount >= 30) {
-          shitFuck.classList.remove("mid-pollen");
-          shitFuck.classList.add("high-pollen");
-        }
-      
+        p2.classList.add(pollenClass);
+
         span.appendChild(p2);
-        span.appendChild(shitFuck);
-        figcaption.appendChild(span);
+        figCaption.appendChild(span);
       });
 
       // Append figcaption to figure
-      pollenFigure.appendChild(figcaption);
+      pollenFigure.appendChild(figCaption);
 
       // Append the figure to the container
       pollenContainer.appendChild(pollenFigure);
@@ -217,91 +205,87 @@ const buildCurrentPollen = (pollen) => {
   });
 };
 
+//#endregion building current pollen
 
+//#region building hourly pollen
 const buildHourlyPollen = (pollen) => {
   if (!pollen || pollen.length === 0) {
     console.error("pollenDataArray is empty");
     return; // Exit the function if no data
   }
 
-  console.log(pollen);
-
   pollenContainer.innerHTML = "";
-  const pollenHeader = `<header class="pollen-header"><h2>Hourly Pollen</h2></header>`
+  const pollenHeader = `<header class="pollen-header"><h2>Hourly Pollen</h2></header>`;
   pollenContainer.innerHTML += pollenHeader;
+
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
-    // Skip iteration if the current key is 'time' or 'formattedTime'
+    // Skip iteration if the current key is 'time' or 'interval'
     if (pollenType === "time" || pollenType === "formattedTime" || pollenType === "interval") return;
 
-    // **Declare included here**
     let included = pollen[0].hasOwnProperty(pollenType);
 
     if (included) {
-      // Create a figure for the current pollen type (if data is included)
-      let pollenFigure = document.createElement("figure");
-      pollenFigure.classList.add("pollen-figure");
-      pollenFigure.classList.add(pollenType); // Add the pollenType as a class to the figure
+      // Creates a figure for the hourly pollen type
+      let pollenFigure = `<figure class="pollen-figure ${pollenType}">`;
 
-      let header = document.createElement("header");
-      let h3 = document.createElement("h3");
-      h3.textContent = pollenType.replace("_pollen", "");
-      header.appendChild(h3);
-      pollenFigure.appendChild(header);
+      let header = `<header><h3>${pollenType.replace("_pollen", "")}</h3></header>`;
+      pollenFigure += header;
 
-      let figcaption = document.createElement("figcaption");
+      let figcaption = "<figcaption>";
 
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
-        let span = document.createElement("span");
-        let p2 = document.createElement("p");
-        p2.textContent = currentPollen[pollenType];
-        let shitFuck = document.createElement("div");
-        shitFuck.classList.add("pollen-amount-box");
-        shitFuck.textContent = ".";
-      
+        let span = "<span>";
+        let p1 = `<p>${currentPollen.formattedTime}</p>`;
+        let p2 = `<div class="pollen-amount-box">${currentPollen[pollenType]}pm &#x33;&#x42;</div>`;
+
         // Set background color based on pollen amount
         let pollenAmount = parseInt(currentPollen[pollenType]);
-        console.log(pollenAmount);
-        if (pollenAmount <= 5) {
-          shitFuck.classList.add("low-pollen");
-        } else if (pollenAmount >= 20) {
-          shitFuck.classList.add("mid-pollen");
+        if (pollenAmount <= 10) {
+          p2 = `<div class="pollen-amount-box low-pollen">${currentPollen[pollenType]}</div>`;
+        } else if (pollenAmount >= 20 && pollenAmount < 60) {
+          p2 = `<div class="pollen-amount-box mid-pollen">${currentPollen[pollenType]}</div>`;
+        } else if (pollenAmount >= 60) {
+          p2 = `<div class="pollen-amount-box high-pollen">${currentPollen[pollenType]}</div>`;
         }
-         else if (pollenAmount >= 40) {
-          shitFuck.classList.add("high-pollen");
-        }
-      
-        span.appendChild(p2);
-        span.appendChild(shitFuck);
-        figcaption.appendChild(span);
+
+        span += p1 + p2 + "</span>";
+        figcaption += span;
       });
 
-      // Append figcaption to figure
-      pollenFigure.appendChild(figcaption);
+      // Appending figcaption to figure
+      pollenFigure += figcaption + "</figcaption>";
 
-      // Append the figure to the container
-      pollenContainer.appendChild(pollenFigure);
+      // Appending the figure to the container
+      pollenContainer.innerHTML += pollenFigure;
 
       // Add display style based on saved checkbox state
       let myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
       if (myPollen[pollenType] === false) {
-        pollenFigure.style.display = "none";
+        document.querySelector(`.pollen-figure.${pollenType}`).style.display = "none";
       } else {
-        pollenFigure.style.display = "block";
+        document.querySelector(`.pollen-figure.${pollenType}`).style.display = "block";
       }
     }
   });
 };
 
+//#endregion building hourly pollen
+
+//Building settings
 const settingsIcon = document.getElementById("settings");
 settingsIcon.addEventListener("click", () => {
   createRetardedCheckboxes();
 });
 
-//Building the pollen view (same as before)
+//Building the current
 const homeBtn = document.getElementById("home");
 homeBtn.addEventListener("click", () => {
   buildCurrentPollen(currentData);
   console.log("Building pollen!");
 });
+//Building the hourly pollen view
+const hourlyPollenCallback = () => {
+  buildHourlyPollen(filteredHourlyData);
+}
