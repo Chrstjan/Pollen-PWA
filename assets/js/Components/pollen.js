@@ -154,7 +154,9 @@ const buildCurrentPollen = (pollen) => {
       // Create a figure for the current pollen type (if data is included)
       let pollenFigure = document.createElement("figure");
       pollenFigure.classList.add("current-pollen-figure", pollenType);
-      pollenFigure.addEventListener("click", hourlyPollenCallback);
+      pollenFigure.addEventListener("click", () => {
+        hourlyPollenCallback(pollenType);
+      });
 
       // Building hourly pollen data on figure click
       let figCaption = document.createElement("figcaption");
@@ -227,45 +229,54 @@ const buildHourlyPollen = (pollen) => {
 
     if (included) {
       // Creates a figure for the hourly pollen type
-      let pollenFigure = `<figure class="pollen-figure ${pollenType}">`;
+      let pollenFigure = document.createElement("figure");
+      pollenFigure.classList.add("pollen-figure", pollenType);
+      pollenFigure.addEventListener("click", currentCallback);
 
-      let header = `<header><h3>${pollenType.replace("_pollen", "")}</h3></header>`;
-      pollenFigure += header;
+      let header = document.createElement("header");
+      let h3 = document.createElement("h3");
+      h3.textContent = pollenType.replace("_pollen", "");
+      header.appendChild(h3);
+      pollenFigure.appendChild(header);
 
-      let figcaption = "<figcaption>";
+      let figcaption = document.createElement("figcaption");
 
       // Iterate over hourly data to populate
       pollen.forEach((currentPollen) => {
-        let span = "<span>";
-        let p1 = `<p>${currentPollen.formattedTime}</p>`;
-        let p2 = `<div class="pollen-amount-box">${currentPollen[pollenType]}pm &#x33;&#x42;</div>`;
+        let span = document.createElement("span");
+        let p1 = document.createElement("p");
+        p1.textContent = currentPollen.formattedTime;
+        let p2 = document.createElement("div");
+        p2.classList.add("pollen-amount-box");
+        p2.textContent = currentPollen[pollenType];
 
         // Set background color based on pollen amount
         let pollenAmount = parseInt(currentPollen[pollenType]);
         if (pollenAmount <= 10) {
-          p2 = `<div class="pollen-amount-box low-pollen">${currentPollen[pollenType]}</div>`;
+          p2.classList.add("low-pollen");
         } else if (pollenAmount >= 20 && pollenAmount < 60) {
-          p2 = `<div class="pollen-amount-box mid-pollen">${currentPollen[pollenType]}</div>`;
+          p2.classList.add("mid-pollen");
         } else if (pollenAmount >= 60) {
-          p2 = `<div class="pollen-amount-box high-pollen">${currentPollen[pollenType]}</div>`;
+          p2.classList.add("high-pollen");
         }
 
-        span += p1 + p2 + "</span>";
-        figcaption += span;
+        span.appendChild(p1);
+        span.appendChild(p2);
+        figcaption.appendChild(span);
       });
 
       // Appending figcaption to figure
-      pollenFigure += figcaption + "</figcaption>";
+      pollenFigure.appendChild(figcaption);
 
       // Appending the figure to the container
-      pollenContainer.innerHTML += pollenFigure;
+      pollenContainer.appendChild(pollenFigure);
 
       // Add display style based on saved checkbox state
       let myPollen = JSON.parse(localStorage.getItem("myPollen")) || {};
       if (myPollen[pollenType] === false) {
-        document.querySelector(`.pollen-figure.${pollenType}`).style.display = "none";
+        pollenFigure.style.display = "none";
       } else {
-        document.querySelector(`.pollen-figure.${pollenType}`).style.display = "block";
+        pollenFigure.style.display = "block";
       }
     }
   });
@@ -285,7 +296,25 @@ homeBtn.addEventListener("click", () => {
   buildCurrentPollen(currentData);
   console.log("Building pollen!");
 });
-//Building the hourly pollen view
-const hourlyPollenCallback = () => {
-  buildHourlyPollen(filteredHourlyData);
+
+//Building the hourly pollen view on figure click
+const hourlyPollenCallback = (pollenType) => {
+
+  console.log(pollenType);
+
+  console.log(filteredHourlyData);
+
+  const clickedPollenData = filteredHourlyData.map(data => ({
+    time: data.time,
+    formattedTime: data.formattedTime,
+    [pollenType]: data[pollenType]
+  }));
+  console.log(clickedPollenData);
+  // Build the clicked hourly pollen figure
+  buildHourlyPollen(clickedPollenData);
+}
+
+//Building the current pollen view on figure click
+const currentCallback = () => {
+  buildCurrentPollen(currentData);
 }
