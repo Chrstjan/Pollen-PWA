@@ -1,6 +1,6 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
-import { createMap, onMapClick } from "./map.js";
+import { createMap } from "./map.js";
 import {
   defineStorage,
   saveLocationData,
@@ -27,6 +27,7 @@ export const getUserLocationName = async (lat, long) => {
   const userLocEndpoint = `https://geocode.maps.co/reverse?lat=${lat}&lon=${long}&api_key=65fbef1c16355178751609wmp6b195b`;
   const userLocationData = await myFetchData(userLocEndpoint);
   recivedLocationName(userLocationData);
+  return userLocationData;
 };
 
 const recivedPosition = (position) => {
@@ -45,17 +46,22 @@ const showPositionError = (error) => {
   console.log(error.message);
 };
 
-const recivedLocationName = (locationName) => {
+export const recivedLocationName = async (locationName) => {
   console.log(locationName);
   console.log(locationName.address.town || locationName.address.city);
 
-  // onMapClick(locationName);
+  // let clickedLocationName = locationName;
+
+  // onMapClick(clickedLocationName);
 
   saveLocationData(locationName.address || locationName.town); //.address.town || .address.city
+  return locationName;
 };
 
-const buildLocations = () => {
+export const buildLocations = () => {
   const locationContainer = document.getElementById("locationContainer");
+  locationContainer.innerHTML = "";
+
   const locationContainerElm = document.createElement("div");
   locationContainerElm.classList.add("location");
 
