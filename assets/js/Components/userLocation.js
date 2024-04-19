@@ -1,6 +1,6 @@
 import { myFetchData } from "../Utils/apiUtils.js";
 import { getPollenData } from "./pollen.js";
-// import { createMap } from "./map.js";
+import { createMap, onMapClick } from "./map.js";
 import { defineStorage,  saveLocationData, getSavedLocations } from "./localStorage.js";
 
 defineStorage();
@@ -16,7 +16,7 @@ export const getLocation = () => {
   }
 };
 
-const getUserLocationName = async (lat, long) => {
+export const getUserLocationName = async (lat, long) => {
   console.log(lat);
   console.log(long);
 
@@ -33,7 +33,7 @@ const recivedPosition = (position) => {
   getUserLocationName(position.coords.latitude, position.coords.longitude);
   getPollenData(position.coords.latitude, position.coords.longitude);
   mapBtn.addEventListener("click", () => {
-    createMap(position.coords.latitude, position.coords.longitude);
+  createMap(position.coords.latitude, position.coords.longitude);
   })
 };
 
@@ -45,7 +45,9 @@ const recivedLocationName = (locationName) => {
   console.log(locationName);
   console.log(locationName.address.town || locationName.address.city);
 
-  saveLocationData(locationName.address); //.address.town || .address.city
+  onMapClick(locationName);
+
+  saveLocationData(locationName.address || locationName.town); //.address.town || .address.city
 };
 
 const buildLocations = () => {

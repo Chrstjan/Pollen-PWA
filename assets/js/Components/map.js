@@ -1,48 +1,54 @@
-const mapParentContainer = document.getElementById("app");
+import { getUserLocationName } from './userLocation.js';
 
-// export const createMap = (lat, long) => {
-//   mapParentContainer.innerHTML = "";
+const mapContainer = document.getElementById("app");
 
-//   const mapContainer = document.createElement("div");
-//   mapContainer.id = "map";
+let map;
 
-//   let map = L.map("map", {
-//     center: [lat, long],
-//     zoom: 13
-//   });
-
-//   console.log("Map!!");
-
-//   console.log(lat, long);
-
-
-//   mapParentContainer.appendChild(mapContainer);
-// }
 export const createMap = (lat, long) => {
-  // Check if mapParentContainer exists
-  const mapParentContainer = document.getElementById("app");
-  if (!mapParentContainer) {
-    console.error("mapParentContainer element not found!");
-    return; // Do nothing if container doesn't exist
-  }
 
-  // Find the existing map container (assuming it has a different class or ID)
-  const existingMapContainer = mapParentContainer.querySelector(".map-container"); // Replace with the actual selector
+ mapContainer.innerHTML = "";
 
-  if (existingMapContainer) {
-    mapParentContainer.removeChild(existingMapContainer);
-  }
+ // Temp map container
+ const mapDiv = document.createElement('div');
+ mapDiv.setAttribute('id', 'map');
+ mapDiv.style.width = '100%';
+ mapDiv.style.height = '70vh'; // Adjust the height as needed
 
-  const mapContainer = document.createElement("div");
-  mapContainer.id = "map";
+ // Append the map div to the mapContainer
+ mapContainer.appendChild(mapDiv);
 
-  let map = L.map("map", {
-    center: [long, lat],
-    zoom: 13
-  });
+ console.log(`map cords: ${lat}, ${long}`);
 
-  console.log("Map!!");
-  console.log(lat, long);
+  map = L.map('map').setView([lat, long], 13);
 
-  mapParentContainer.appendChild(mapContainer);
+  console.log(map);
+
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+ L.marker([lat, long]).addTo(map)
+     .bindPopup('Current location')
+     .openPopup();
+
+  //Calling function on map click
+  map.on("click", onMapClick);
+}
+
+let popup = L.popup();
+
+export const onMapClick = async ({ latlng }, locationName) => {
+  const { lat, lng } = latlng; // Destructuring assignment to extract lat and lng
+  popup
+    .setLatLng(latlng)
+    .setContent(`You clicked the map at ${lat}, ${lng}`) // Using lat and lng variables
+    .openOn(map);
+
+    getUserLocationName(lat, lng);
+
+    console.log(locationName);    
+
+    L.marker([lat, lng]).addTo(map)
+    .bindPopup(`Set location: Lat: ${lat}, Long: ${lng}`)
+    .openPopup();
 }
