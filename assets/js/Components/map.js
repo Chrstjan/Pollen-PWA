@@ -1,5 +1,4 @@
-import { saveLocationData } from "./localStorage.js";
-import { getUserLocationName, buildLocations } from "./userLocation.js";
+import { getUserLocationName } from "./userLocation.js";
 
 const mapContainer = document.getElementById("app");
 
@@ -36,34 +35,15 @@ export const createMap = (lat, long) => {
 
 let popup = L.popup();
 
-const onMapClick = async ({ latlng }) => {
-  buildLocations();
-
+export const onMapClick = async ({ latlng }) => {
   const { lat, lng } = latlng; // Destructuring assignment to extract lat and lng
-
-  const clickedLocation = await getUserLocationName(lat, lng);
-
-  //Used for saving to local storage
-  const clickedLocationAddress = clickedLocation.address;
-
-  const clickedLocationName =
-    clickedLocation.address.town || clickedLocation.address.city;
-
-  console.log(clickedLocationName);
-
-  saveLocationData(clickedLocationAddress);
-
   popup
     .setLatLng(latlng)
-    .setContent(
-      `You clicked the map at ${lat}, ${lng}, Location: ${clickedLocationName}`
-    )
+    .setContent(`You clicked the map at ${lat}, ${lng}`) // Using lat and lng variables
     .openOn(map);
 
   L.marker([lat, lng])
     .addTo(map)
-    .bindPopup(
-      `Set location: Lat: ${lat}, Long: ${lng}, Location: ${clickedLocationName}`
-    )
+    .bindPopup(`Set location: Lat: ${lat}, Long: ${lng}`)
     .openPopup();
 };
