@@ -1,8 +1,10 @@
-import { getUserLocationName } from "./userLocation.js";
+import { getUserLocationName, buildLocations } from "./userLocation.js";
 
 const mapContainer = document.getElementById("app");
 
 let map;
+let curLat;
+let curLong;
 
 export const createMap = (lat, long) => {
   mapContainer.innerHTML = "";
@@ -29,6 +31,9 @@ export const createMap = (lat, long) => {
 
   L.marker([lat, long]).addTo(map).bindPopup("Current location").openPopup();
 
+  curLat = lat;
+  curLong = long;
+
   //Calling function on map click
   map.on("click", onMapClick);
 };
@@ -37,13 +42,33 @@ let popup = L.popup();
 
 export const onMapClick = async ({ latlng }) => {
   const { lat, lng } = latlng; // Destructuring assignment to extract lat and lng
+
+  const clickedLocation = await getUserLocationName(lat, lng);
+
+  const clickedLocationName = clickedLocation.address;
+
+  buildLocations();
+
+  console.log(clickedLocationName);
+
   popup
     .setLatLng(latlng)
-    .setContent(`You clicked the map at ${lat}, ${lng}`) // Using lat and lng variables
+    .setContent(
+      `You clicked the map at ${lat}, ${lng}, Location: ${
+        clickedLocationName.city || clickedLocationName.town
+      }`
+    ) // Using lat and lng variables
     .openOn(map);
 
   L.marker([lat, lng])
     .addTo(map)
-    .bindPopup(`Set location: Lat: ${lat}, Long: ${lng}`)
+    .bindPopup(
+      `Set location: Lat: ${lat}, Long: ${lng}, Location: ${
+        clickedLocationName.city || clickedLocationName.town
+      }`
+    )
     .openPopup();
+
+  curLat = lat;
+  curLong = lng;
 };
