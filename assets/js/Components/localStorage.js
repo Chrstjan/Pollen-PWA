@@ -53,6 +53,46 @@ export function defineStorage() {
   }
 //#endregion saving user location
 
+//#region saving user pins
+export const definePinsStorage = () => {
+  let myLocationPins = sessionStorage.getItem("myLocationPins");
+  
+    if (!myLocationPins) {
+      let newMyLocationPins = {
+        myPins: [],
+      };
+  
+      saveLocationPins(newMyLocationPins);
+    }
+}
+
+//This should only save the latest 3 pins
+export const saveLocationPins = (clickedPins) => {
+  let myLocationPinsData = getSavedPins();
+  if (!myLocationPinsData) {
+    myLocationPinsData = { myPins: [] };
+  }
+
+  myLocationPinsData.myPins.push(clickedPins);
+
+  if (myLocationPinsData.myPins.length > 3) {
+    myLocationPinsData.myPins = myLocationPinsData.myPins.slice(-3);
+  }
+
+  console.log(myLocationPinsData);
+
+  let mySerializedData = JSON.stringify(myLocationPinsData);
+  sessionStorage.setItem("myLocationPins", mySerializedData);
+}
+
+export const getSavedPins = () => {
+  let myLocationPinsString = sessionStorage.getItem("myLocationPins");
+  let myLocationPinsData = JSON.parse(myLocationPinsString);
+  return myLocationPinsData;
+}
+
+//#endregion saving user pins
+
 //#region saving user pollen selections
 export function definePollenStorage() {
     let myPollen = localStorage.getItem("myPollen");

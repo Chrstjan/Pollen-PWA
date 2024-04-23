@@ -67,7 +67,9 @@ export const buildLocations = () => {
     <header>
       <h2>${
         savedLocalLocations.currentLocation.city ||
-        savedLocalLocations.currentLocation.town
+        savedLocalLocations.currentLocation.town ||
+        savedLocalLocations.currentLocation.village ||
+        savedLocalLocations.currentLocation.hamlet
       }</h2>
     </header>`;
 
