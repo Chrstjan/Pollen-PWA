@@ -44,12 +44,30 @@ export const onMapClick = async ({ latlng }) => {
   const { lat, lng } = latlng; // Destructuring assignment to extract lat and lng
 
   const clickedLocation = await getUserLocationName(lat, lng);
-
   const clickedLocationName = clickedLocation.address;
 
   buildLocations();
 
+  map.removeLayer(popup);
+  map.eachLayer(function (layer) {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer);
+    }
+  });
+
+  const newMarker = L.marker([lat, lng])
+    .addTo(map) // This line might be causing the error
+    .bindPopup(
+      `Current Location: ${
+        clickedLocationName.city || clickedLocationName.town
+      }`
+    )
+    .openPopup();
+
   console.log(clickedLocationName);
+
+  curLat = lat;
+  curLong = lng;
 
   popup
     .setLatLng(latlng)
@@ -57,18 +75,6 @@ export const onMapClick = async ({ latlng }) => {
       `You clicked the map at ${lat}, ${lng}, Location: ${
         clickedLocationName.city || clickedLocationName.town
       }`
-    ) // Using lat and lng variables
-    .openOn(map);
-
-  L.marker([lat, lng])
-    .addTo(map)
-    .bindPopup(
-      `Set location: Lat: ${lat}, Long: ${lng}, Location: ${
-        clickedLocationName.city || clickedLocationName.town
-      }`
     )
-    .openPopup();
-
-  curLat = lat;
-  curLong = lng;
+    .openOn(map);
 };
