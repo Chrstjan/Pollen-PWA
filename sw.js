@@ -48,6 +48,6 @@ self.addEventListener("activate", (e) => {
 //Call fetch event
 self.addEventListener("fetch", (e) => {
     console.log("Service Worker: Fetching");
-    //Checks if the live site is avaiable else load from the cache
+    //Checks if the live site is available else load from the cache
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
