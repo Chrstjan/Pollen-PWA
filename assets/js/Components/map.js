@@ -8,8 +8,6 @@ const mapContainer = document.getElementById("app");
 let map;
 let curLat;
 let curLong;
-let savedLocations;
-let savedLocationsArray = [];
 
 export const createMap = async (lat, long) => {
   mapContainer.innerHTML = "";
@@ -22,24 +20,6 @@ export const createMap = async (lat, long) => {
 
   // Append the map div to the mapContainer
   mapContainer.appendChild(mapDiv);
-
-  //Getting the last 3 saved locations & using destructuring assignment to save the lat & long cords
-  let savedStoragePins = getSavedPins();
-
-  let lastClickedLocations = savedStoragePins;
-
-  lastClickedLocations.map((location) => {
-    //Note also get the address
-    const { lat, lng } = location.latlng;
-    const {city, town, village, hamlet} =location.clickedLocationName;
-    console.log(location);
-
-    console.log(`${lat, lng}`);
-    savedLocations = {lat, lng, city, town, village, hamlet };
-    savedLocationsArray.push(savedLocations);
-  })
-
-  console.log(savedLocationsArray);
 
   console.log(`map cords: ${lat}, ${long}`);
 
@@ -68,15 +48,6 @@ export const createMap = async (lat, long) => {
        currentLocationName.hamlet
       }`
     ).openPopup();
-
-    savedLocationsArray.map((savedLocation) => {
-      L.marker([savedLocation.lat, savedLocation.lng]).addTo(map).bindPopup(
-        `Saved location:
-         ${
-          savedLocation.city || savedLocation.town || savedLocation.village || savedLocation.hamlet
-          }`
-        ).openPopup();
-    })
 
   curLat = lat;
   curLong = long;
