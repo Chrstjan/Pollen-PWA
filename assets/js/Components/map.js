@@ -9,6 +9,8 @@ const mapContainer = document.getElementById("app");
 let map;
 let curLat;
 let curLong;
+let savedLocationName;
+let savedLocationNameArray = [];
 
 export const createMap = (lat, long) => {
   mapContainer.innerHTML = "";

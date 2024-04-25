@@ -195,7 +195,9 @@ const buildCurrentPollen = (pollen) => {
         } else if (pollenAmount >= 60) {
           pollenClass = "high-pollen";
         }
+
         p2.classList.add(pollenClass);
+        // p2.classList.add(pollenClass); //Why does this cause an error?
 
         span.appendChild(p2);
         figCaption.appendChild(span);
