@@ -3,6 +3,10 @@
 @import url(main.css);
 @import url(footer.css);
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;

@@ -1,0 +1,122 @@
+:root {
+  --light-green: #70C2B4;
+  --neutral-green: #50B8AE;
+  --active-green: #4BA598;
+  --warning-pink: #EC9AAA;
+  --medium-value: #F1C879;
+  --light-blue: #6793C4;
+}
+
+#locationContainer .location {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  background: var(--active-green);
+  color: #fff;
+}
+
+#app .pollen-header {
+  text-align: center;
+}
+
+#app figure {
+  border: 1px solid #000;
+  /* padding-left: 7rem; */
+}
+
+#app figure header {
+  /* display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center; */
+}
+
+#app figure figcaption {
+  padding-bottom: 1rem;
+  /* display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center; */
+}
+
+#app figure figcaption .hourly-pollen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#app figure header {
+  text-align: center;
+}
+
+#app figure figcaption span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/*Pollen box colors for different amount  */
+#app figure figcaption span .pollen-amount-box {
+  display: block;
+  text-align: center;
+  border-radius: 30px;
+}
+
+#app figure figcaption span .low-pollen {
+  display: block;
+  background: var(--active-green);
+  width: 10%;
+}
+
+#app figure figcaption span .mid-pollen {
+  display: block;
+  background: var(--medium-value);
+  width: 50%;
+}
+
+#app figure figcaption span .high-pollen {
+  display: block;
+  background: var(--warning-pink);
+  width: 70%;
+}
+
+#app .checkboxes-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #000;
+  width: 70vw;
+  border-radius: 10px;
+  margin: 0.6rem 0rem 0rem 3.3rem;
+}
+
+.checkboxes-container .pollen-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#navigation div {
+  width: 100vw;
+  background: var(--active-green);
+  height: 10vh;
+}
+
+#navigation div figure {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#navigation div figure img {
+  padding-top: 0.7rem;
+  width: 10vw;
+  filter: invert(100%);
+}

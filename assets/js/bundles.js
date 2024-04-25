@@ -1,3 +1,5 @@
-import { logMessage } from "./Components/app.js";
+import { serviceWorker } from "./Components/app.js";
+import { getLocation } from "./Components/userLocation.js";
 
-logMessage();
+serviceWorker();
+getLocation();

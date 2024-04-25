@@ -1,2 +1,3 @@
-# Js-Boilerplate-2.0
-Boilerplate 3.0
+# Pollen PWA
+Pollen Progressive Web App
+Page: https://chrstjan.github.io/Pollen-PWA/
