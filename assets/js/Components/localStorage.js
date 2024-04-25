@@ -56,43 +56,40 @@ export function defineStorage() {
 //#region saving user pins
 export const definePinsStorage = () => {
   let myLocationPins = sessionStorage.getItem("myLocationPins");
-  // Only initialize if myLocationPins doesn't exist
-  if (!myLocationPins) {
-    let newMyLocationPins = {
-      myPins: [],
-    };
-    saveLocationPins(newMyLocationPins);
-  }
-};
+  
+    if (!myLocationPins) {
+      let newMyLocationPins = {
+        myPins: [],
+      };
+  
+      saveLocationPins(newMyLocationPins);
+    }
+}
 
-export const saveLocationPins = (clickedLocationName, latlng) => {
-  // Retrieve existing pins from sessionStorage or initialize an empty array
-  let pins = JSON.parse(sessionStorage.getItem("myLocationPins")) || [];
-
-  // Ensure pins is an array
-  if (!Array.isArray(pins)) {
-    pins = [];
-  }
-
-  // Remove the oldest pin if the number of saved pins exceeds 3
-  if (pins.length >= 3) {
-    pins.shift(); // Remove the first (oldest) element
+//This should only save the latest 3 pins
+export const saveLocationPins = (clickedPins) => {
+  let myLocationPinsData = getSavedPins();
+  if (!myLocationPinsData) {
+    myLocationPinsData = { myPins: [] };
   }
 
-  // Add the new marker coordinates to the end of the array of pins
-  pins.push({ clickedLocationName, latlng });
+  myLocationPinsData.myPins.push(clickedPins);
 
-  // Save the updated array back to sessionStorage
-  sessionStorage.setItem("myLocationPins", JSON.stringify(pins));
-};
+  if (myLocationPinsData.myPins.length > 3) {
+    myLocationPinsData.myPins = myLocationPinsData.myPins.slice(-3);
+  }
+
+  console.log(myLocationPinsData);
+
+  let mySerializedData = JSON.stringify(myLocationPinsData);
+  sessionStorage.setItem("myLocationPins", mySerializedData);
+}
 
 export const getSavedPins = () => {
   let myLocationPinsString = sessionStorage.getItem("myLocationPins");
-  if (myLocationPinsString) {
-    return JSON.parse(myLocationPinsString);
-  }
-  return null;
-};
+  let myLocationPinsData = JSON.parse(myLocationPinsString);
+  return myLocationPinsData;
+}
 
 //#endregion saving user pins
 

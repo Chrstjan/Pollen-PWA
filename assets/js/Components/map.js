@@ -1,7 +1,8 @@
 import { definePinsStorage, saveLocationPins, getSavedPins } from './localStorage.js';
+
 definePinsStorage();
+
 import { getUserLocationName, buildLocations } from "./userLocation.js";
-import { getPollenData } from './pollen.js';
 
 const mapContainer = document.getElementById("app");
 
@@ -9,7 +10,7 @@ let map;
 let curLat;
 let curLong;
 
-export const createMap = async (lat, long) => {
+export const createMap = (lat, long) => {
   mapContainer.innerHTML = "";
 
   // Temp map container
@@ -23,13 +24,6 @@ export const createMap = async (lat, long) => {
 
   console.log(`map cords: ${lat}, ${long}`);
 
-  const currentLocation = await getUserLocationName(lat, long);
-
-  const currentLocationName = currentLocation.address;
-
-  console.log(currentLocationName);
-
-
   map = L.map("map").setView([lat, long], 13);
 
   console.log(map);
@@ -39,15 +33,7 @@ export const createMap = async (lat, long) => {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
-  L.marker([lat, long]).addTo(map).bindPopup(
-    `Current location:
-     ${
-       currentLocationName.city ||
-       currentLocationName.town ||
-       currentLocationName.village ||
-       currentLocationName.hamlet
-      }`
-    ).openPopup();
+  L.marker([lat, long]).addTo(map).bindPopup("Current location").openPopup();
 
   curLat = lat;
   curLong = long;
@@ -73,10 +59,7 @@ export const onMapClick = async ({ latlng }) => {
     .setLatLng(latlng)
     .setContent(
       `You clicked the map at ${lat}, ${lng}, Location: ${
-        clickedLocationName.city ||
-        clickedLocationName.town ||
-        clickedLocationName.village ||
-        clickedLocationName.hamlet
+        clickedLocationName.city || clickedLocationName.town
       }`
     ) // Using lat and lng variables
     .openOn(map);
@@ -85,16 +68,13 @@ export const onMapClick = async ({ latlng }) => {
     .addTo(map)
     .bindPopup(
       `Set location: Lat: ${lat}, Long: ${lng}, Location: ${
-        clickedLocationName.city || 
-        clickedLocationName.town ||
-        clickedLocationName.village ||
-        clickedLocationName.hamlet
+        clickedLocationName.city || clickedLocationName.town
       }`
     )
     .openPopup();
 
     console.log(newMarker);
-    saveLocationPins(clickedLocationName, latlng);
+    saveLocationPins(newMarker);
 
   curLat = lat;
   curLong = lng;

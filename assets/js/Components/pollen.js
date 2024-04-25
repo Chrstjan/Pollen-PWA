@@ -1,4 +1,4 @@
-//#region GLOBALS
+//GLOBALS
 import { myFetchData } from "../Utils/apiUtils.js";
 import { definePollenStorage } from "./localStorage.js";
 import { buildLocations } from "./userLocation.js";
@@ -7,10 +7,8 @@ definePollenStorage();
 
 const pollenContainer = document.getElementById("app");
 
-
 let currentData = [];
 let filteredHourlyData = [];
-//#endregion GLOBALS
 
 export const getPollenData = async (lat, long) => {
   console.log("Pollen!!");
@@ -306,7 +304,6 @@ const buildHourlyPollen = (pollen) => {
 const settingsIcon = document.getElementById("settings");
 settingsIcon.addEventListener("click", () => {
   createRetardedCheckboxes();
-  buildLocations();
 });
 
 //Building the current
