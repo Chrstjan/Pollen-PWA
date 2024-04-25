@@ -1,48 +1,87 @@
-const mapParentContainer = document.getElementById("app");
+import { definePinsStorage, saveLocationPins, getSavedPins } from './localStorage.js';
 
-// export const createMap = (lat, long) => {
-//   mapParentContainer.innerHTML = "";
+definePinsStorage();
 
-//   const mapContainer = document.createElement("div");
-//   mapContainer.id = "map";
+import { getUserLocationName, buildLocations } from "./userLocation.js";
 
-//   let map = L.map("map", {
-//     center: [lat, long],
-//     zoom: 13
-//   });
+const mapContainer = document.getElementById("app");
 
-//   console.log("Map!!");
+let map;
+let curLat;
+let curLong;
+let savedLocationName;
+let savedLocationNameArray = [];
 
-//   console.log(lat, long);
-
-
-//   mapParentContainer.appendChild(mapContainer);
-// }
 export const createMap = (lat, long) => {
-  // Check if mapParentContainer exists
-  const mapParentContainer = document.getElementById("app");
-  if (!mapParentContainer) {
-    console.error("mapParentContainer element not found!");
-    return; // Do nothing if container doesn't exist
-  }
+  mapContainer.innerHTML = "";
 
-  // Find the existing map container (assuming it has a different class or ID)
-  const existingMapContainer = mapParentContainer.querySelector(".map-container"); // Replace with the actual selector
+  // Temp map container
+  const mapDiv = document.createElement("div");
+  mapDiv.setAttribute("id", "map");
+  mapDiv.style.width = "100%";
+  mapDiv.style.height = "70vh"; // Adjust the height as needed
 
-  if (existingMapContainer) {
-    mapParentContainer.removeChild(existingMapContainer);
-  }
+  // Append the map div to the mapContainer
+  mapContainer.appendChild(mapDiv);
 
-  const mapContainer = document.createElement("div");
-  mapContainer.id = "map";
+  let savedPinsLocation = getSavedPins();
+  console.log(savedPinsLocation[1]);
 
-  let map = L.map("map", {
-    center: [long, lat],
-    zoom: 13
-  });
+  console.log(`map cords: ${lat}, ${long}`);
 
-  console.log("Map!!");
-  console.log(lat, long);
+  map = L.map("map").setView([lat, long], 13);
 
-  mapParentContainer.appendChild(mapContainer);
-}
+  console.log(map);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  L.marker([lat, long]).addTo(map).bindPopup("Current location").openPopup();
+
+  curLat = lat;
+  curLong = long;
+
+  //Calling function on map click
+  map.on("click", onMapClick);
+};
+
+let popup = L.popup();
+
+export const onMapClick = async ({ latlng }) => {
+  const { lat, lng } = latlng; // Destructuring assignment to extract lat and lng
+
+  const clickedLocation = await getUserLocationName(lat, lng);
+
+  const clickedLocationName = clickedLocation.address;
+
+  buildLocations();
+
+  console.log(clickedLocationName);
+
+  popup
+    .setLatLng(latlng)
+    .setContent(
+      `You clicked the map at ${lat}, ${lng}, Location: ${
+        clickedLocationName.city || clickedLocationName.town
+      }`
+    ) // Using lat and lng variables
+    .openOn(map);
+
+  let newMarker = L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(
+      `Set location: Lat: ${lat}, Long: ${lng}, Location: ${
+        clickedLocationName.city || clickedLocationName.town
+      }`
+    )
+    .openPopup();
+
+    console.log(newMarker);
+    saveLocationPins(newMarker);
+
+  curLat = lat;
+  curLong = lng;
+};
+

@@ -1,0 +1,35 @@
+{
+    "name": "Pollen PWA",
+    "short_name": "PollenPWA",
+    "start_url": "./index.html",
+    "id": "./index.html",
+    "display": "standalone",
+    "description": "See pollen near you",
+    "screenshots": [
+        {
+            "src": "./assets/img/Screenshot.png",
+            "sizes": "352x636",
+            "form_factor": "wide"
+        },
+        {
+            "src": "./assets/img/Screenshot.png",
+            "sizes": "352x636",
+            "form_factor": "narrow"
+        }
+    ],
+    "icons": [
+        {
+            "src": "./assets/img/birkIcon.png",
+            "sizes": "48x48",
+            "type": "image/png"
+        },
+        {
+            "src": "./assets/img/icon-144-144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ],
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "orientation": "portrait-primary"
+}

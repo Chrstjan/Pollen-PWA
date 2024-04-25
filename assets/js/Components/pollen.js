@@ -1,6 +1,7 @@
 //GLOBALS
 import { myFetchData } from "../Utils/apiUtils.js";
 import { definePollenStorage } from "./localStorage.js";
+import { buildLocations } from "./userLocation.js";
 
 definePollenStorage();
 
@@ -24,7 +25,7 @@ const recivedPollenData = (pollenData) => {
   currentData.push(pollenData.current);
 
   console.log(currentData);
-  
+
   let timeStamps = pollenData.hourly.time;
 
   let hourData = [];
@@ -82,7 +83,12 @@ const createRetardedCheckboxes = () => {
   // Iterate over each pollen type
   Object.keys(filteredHourlyData[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
-    if (pollenType === "time" || pollenType === "formattedTime" || pollenType === "interval" ) return;
+    if (
+      pollenType === "time" ||
+      pollenType === "formattedTime" ||
+      pollenType === "interval"
+    )
+      return;
 
     // **Declare included here**
     let included = filteredHourlyData[0].hasOwnProperty(pollenType);
@@ -145,7 +151,12 @@ const buildCurrentPollen = (pollen) => {
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'formattedTime'
-    if (pollenType === "time" || pollenType === "formattedTime" || pollenType === "interval") return;
+    if (
+      pollenType === "time" ||
+      pollenType === "formattedTime" ||
+      pollenType === "interval"
+    )
+      return;
 
     // **Declare included here**
     let included = pollen[0].hasOwnProperty(pollenType);
@@ -184,7 +195,9 @@ const buildCurrentPollen = (pollen) => {
         } else if (pollenAmount >= 60) {
           pollenClass = "high-pollen";
         }
+
         p2.classList.add(pollenClass);
+        // p2.classList.add(pollenClass); //Why does this cause an error?
 
         span.appendChild(p2);
         figCaption.appendChild(span);
@@ -223,7 +236,12 @@ const buildHourlyPollen = (pollen) => {
   // Iterate over each pollen type
   Object.keys(pollen[0]).forEach((pollenType) => {
     // Skip iteration if the current key is 'time' or 'interval'
-    if (pollenType === "time" || pollenType === "formattedTime" || pollenType === "interval") return;
+    if (
+      pollenType === "time" ||
+      pollenType === "formattedTime" ||
+      pollenType === "interval"
+    )
+      return;
 
     let included = pollen[0].hasOwnProperty(pollenType);
 
@@ -294,12 +312,12 @@ settingsIcon.addEventListener("click", () => {
 const homeBtn = document.getElementById("home");
 homeBtn.addEventListener("click", () => {
   buildCurrentPollen(currentData);
+  buildLocations();
   console.log("Building pollen!");
 });
 
 //Building the hourly pollen view on figure click
 const hourlyPollenCallback = (pollenType) => {
-
   console.log(pollenType);
 
   console.log(filteredHourlyData);
@@ -309,17 +327,17 @@ const hourlyPollenCallback = (pollenType) => {
   Also includes the time & formattedTime key values
   Makes a new array with data objects from the current hour & 4 hours forward 
   */
-  const clickedPollenData = filteredHourlyData.map(data => ({
+  const clickedPollenData = filteredHourlyData.map((data) => ({
     time: data.time,
     formattedTime: data.formattedTime,
-    [pollenType]: data[pollenType]
+    [pollenType]: data[pollenType],
   }));
   console.log(clickedPollenData);
   // Build the clicked hourly pollen figure
   buildHourlyPollen(clickedPollenData);
-}
+};
 
 //Building the current pollen view on figure click
 const currentCallback = () => {
   buildCurrentPollen(currentData);
-}
+};

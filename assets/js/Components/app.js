@@ -1,9 +1,11 @@
-import { myFetchData } from "../Utils/apiUtils.js";
-
-//Used for checking modules works as intended
-export const logMessage = async () => {
-  console.log("hello from logMessage in app.js");
-  const endpoint = "https://dummyjson.com/products/1"; //Change the endpoint variable to the desired endpoint
-  const data = await myFetchData(endpoint);
-  console.log(data);
-};
+//makes sure service worker is supported
+export const serviceWorker = () => {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register('../../../sw.js')
+        .then(reg => console.log(`Service Worker: Registered: ${reg}`))
+        .catch(err => console.log(`Service Worker: Error: ${err}`))
+    });
+  }
+}
