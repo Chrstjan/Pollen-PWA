@@ -24,6 +24,9 @@ export const createMap = (lat, long) => {
   // Append the map div to the mapContainer
   mapContainer.appendChild(mapDiv);
 
+  let savedPinsLocation = getSavedPins();
+  console.log(savedPinsLocation[1]);
+
   console.log(`map cords: ${lat}, ${long}`);
 
   map = L.map("map").setView([lat, long], 13);
